@@ -14,9 +14,11 @@ import org.springframework.boot.web.server.LocalServerPort;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+// ให้ Spring Boot กำหนด port ให้เรา (เพื่อไม่ให้ port ชนกันเมื่อรันหลาย test case)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 public class AddBookTests {
 
+    // เก็บค่า port เพื่อที่จะได้ไปถูกหน้า
     @LocalServerPort
     private Integer port;
 
@@ -26,13 +28,10 @@ public class AddBookTests {
     // เป็นการกำหนดว่า field นี้อยู่ที่ id ไหน โดยไม่ต้องกำหนดในแต่ละ test case
     @FindBy(id = "nameInput")
     private WebElement nameField;
-
     @FindBy(id = "authorInput")
     private WebElement authorField;
-
     @FindBy(id = "priceInput")
     private WebElement priceField;
-
     @FindBy(id = "submitButton")
     private WebElement submitButton;
 
@@ -48,8 +47,10 @@ public class AddBookTests {
     // ทำก่อนในแต่ละ test case
     @BeforeEach
     public void beforeEach() {
-        // เปิดหน้าเว็บ
+        // เปิดหน้าเว็บ แล้วเข้าไปยัง port ที่สร้างไว้เพื่อ test
         driver.get("http://localhost:" + port + "/book/add");
+
+        // กำหนด field ให้กับ id โดยใช้ @FindBy
         PageFactory.initElements(driver, this);
     }
 
@@ -77,7 +78,8 @@ public class AddBookTests {
 //        WebElement priceField = driver.findElement(By.id("priceInput"));
 
         // หาปุ่ม submit
-        WebElement submitButton = driver.findElement(By.id("submitButton"));
+        // ไม่ต้องหาแล้ว เพราะใช้ @FindBy ข้างนอก test case
+//        WebElement submitButton = driver.findElement(By.id("submitButton"));
 
         // ใส่ข้อมูลในแต่ละ field
         nameField.sendKeys("Clean Code");
@@ -93,6 +95,8 @@ public class AddBookTests {
 //                webDriver.findElement(By.tagName("td")));
 //        assertEquals("Clean Code", firstTd.getText());
 
+        // หาจาก <td> ใน books.html (โดยใช้ xpath / การเจาะเข้าไปใน html)
+        // table -> tbody -> tr[1] (row 1) -> td[x] (column x)
         WebElement name = wait.until(webDriver -> webDriver
                 .findElement(By.xpath("//table/tbody/tr[1]/td[1]")));
         WebElement author = driver
